@@ -1,4 +1,4 @@
-specVersion: 0.0.1
+specVersion: 0.0.2
 description: Tradegen is a decentralized asset management and algo trading platform on Celo.
 repository: https://github.com/Tradegen/algo-trading-marketplace-subgraph
 schema:
@@ -28,7 +28,7 @@ dataSources:
           handler: handleRemoveListing
         - event: UpdatedPrice(indexed address,uint256,uint256)
           handler: handleUpdatePrice
-        - event: Purchased(indexed address,uint256,uint256,uint256,uint256)
+        - event: Purchased(indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handlePurchase
-        - event: UpdatedFee(uint256)
-          handler: handleUpdatedFee
+        - event: UpdatedTransactionFee(uint256)
+          handler: handleUpdatedTransactionFee

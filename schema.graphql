@@ -11,10 +11,18 @@ type Marketplace @entity {
     tradingBotVolume: BigInt!
     componentInstanceVolume: BigInt!
 
+    totalSales: Int!
     totalComponentsSold: Int!
     totalTradingBotsSold: Int!
     totalComponentInstancesSold: Int!
     txCount: Int!
+
+    # Represents a percentage, denominated in 10000.
+    # Ex) 2% fee = 200.
+    transactionFee: BigInt!
+
+    # Measured in TGEN.
+    collectedFees: BigInt!
 }
 
 type Listing @entity {
@@ -53,6 +61,7 @@ type User @entity {
     componentVolume: BigInt!
     tradingBotVolume: BigInt!
     componentInstancesVolume: BigInt!
+    totalFeesPaid: BigInt
 
     listings: [Listing!]! @derivedFrom(field: "seller")
     transactions: [Transaction!]! @derivedFrom(field: "user")
@@ -146,12 +155,14 @@ type MarketplaceDayData @entity {
     dailyComponentVolume: BigInt!
     dailyTradingBotVolume: BigInt!
     dailyComponentInstancesVolume: BigInt!
+    dailyFeesCollected: BigInt!
 
     # Measured in TGEN.
     totalCumulativeVolume: BigInt!
     totalComponentVolume: BigInt!
     totalTradingBotVolume: BigInt!
     totalComponentInstancesVolume: BigInt!
+    totalFeesCollected: BigInt!
 
     dailyCumulativeSales: Int!
     dailyComponentsSold: Int!
