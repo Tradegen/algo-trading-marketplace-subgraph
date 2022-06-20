@@ -1,0 +1,34 @@
+specVersion: 0.0.1
+description: Tradegen is a decentralized asset management and algo trading platform on Celo.
+repository: https://github.com/Tradegen/algo-trading-marketplace-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Marketplace
+    network: celo-alfajores
+    source:
+      address: "0xaA6aE6e34d2c0A7B7Ce8D83bd5c0877a3B273a55"
+      abi: Marketplace
+      startBlock: 11577500
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/Marketplace.ts
+      entities:
+        - Listing
+      abis:
+        - name: Marketplace
+          file: ./abis/Marketplace.json
+      eventHandlers:
+        - event: CreatedListing(indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleCreateListing
+        - event: RemovedListing(indexed address,uint256)
+          handler: handleRemoveListing
+        - event: UpdatedPrice(indexed address,uint256,uint256)
+          handler: handleUpdatePrice
+        - event: Purchased(indexed address,uint256,uint256,uint256,uint256)
+          handler: handlePurchase
+        - event: UpdatedFee(uint256)
+          handler: handleUpdatedFee
