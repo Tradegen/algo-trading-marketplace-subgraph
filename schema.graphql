@@ -1,0 +1,162 @@
+type Marketplace @entity {
+    # Marketplace contract address.
+    id: ID!
+
+    # Total number of listings.
+    listingCount: Int!
+
+    # Measured in TGEN.
+    totalVolume: BigInt!
+    componentVolume: BigInt!
+    tradingBotVolume: BigInt!
+    componentInstanceVolume: BigInt!
+
+    totalComponentsSold: Int!
+    totalTradingBotsSold: Int!
+    totalComponentInstancesSold: Int!
+    txCount: Int!
+}
+
+type Listing @entity {
+    # Listing ID in Marketplace contract.
+    id: ID!
+    exists: Boolean!
+
+    seller: User!
+
+    # 0 = trading bot.
+    # 1 = component.
+    # 2 = component instance.
+    contractType: BigInt!
+
+    # Used for getting the ComponentInstances contract if needed.
+    componentID: BigInt!
+
+    # NFT ID.
+    tokenID: BigInt!
+
+    # Measured in TGEN.
+    price: BigInt!
+}
+
+type User @entity {
+    # User's wallet address.
+    id: ID!
+    
+    totalNumberOfSales: Int!
+    componentsSold: Int!
+    tradingBotsSold: Int!
+    componentInstancesSold: Int!
+
+    # Measured in TGEN.
+    totalVolume: BigInt!
+    componentVolume: BigInt!
+    tradingBotVolume: BigInt!
+    componentInstancesVolume: BigInt!
+
+    listings: [Listing!]! @derivedFrom(field: "seller")
+    transactions: [Transaction!]! @derivedFrom(field: "user")
+}
+
+type Transaction @entity {
+    # Transaction hash.
+    id: ID!
+    blockNumber: BigInt!
+    timestamp: BigInt!
+    user: User!
+    contractType: BigInt!
+    componentID: BigInt!
+    tokenID: BigInt!
+
+    createListing: CreateListing
+    removeListing: RemoveListing
+    updatePrice: UpdatePrice
+    purchase: Purchase
+}
+
+type CreateListing @entity {
+    # Transaction ID + "-createListing".
+    id: ID!
+    transaction: Transaction!
+    # Need this to pull recent txns for marketplace.
+    timestamp: BigInt! 
+
+    seller: String!
+    contractType: BigInt!
+    componentID: BigInt!
+    tokenID: BigInt!
+    price: BigInt!
+
+    # Listing ID.
+    index: BigInt!
+}
+
+type RemoveListing @entity {
+    # Transaction ID + "-removeListing".
+    id: ID!
+    transaction: Transaction!
+    # Need this to pull recent txns for marketplace.
+    timestamp: BigInt!
+
+    seller: String!
+
+    # Listing ID.
+    index: BigInt!
+}
+
+type UpdatePrice @entity {
+    # Transaction ID + "-updatePrice".
+    id: ID!
+    transaction: Transaction!
+    # Need this to pull recent txns for marketplace.
+    timestamp: BigInt!
+
+    seller: String!
+    newTokenPrice: BigInt!
+
+    # Listing ID.
+    index: BigInt!
+}
+
+type Purchase @entity {
+    # Transaction ID + "-purchase".
+    id: ID!
+    transaction: Transaction!
+    # Need this to pull recent txns for marketplace.
+    timestamp: BigInt!
+
+    buyer: String!
+    contractType: BigInt!
+    componentID: BigInt!
+    tokenID: BigInt!
+    price: BigInt!
+
+    # Listing ID.
+    index: BigInt!
+}
+
+# Data accumulated and condensed into day stats for all of marketplace.
+type MarketplaceDayData @entity {
+    # Timestamp rounded to current day by dividing by 86400.
+    id: ID! 
+    date: Int!
+
+    # Measured in TGEN.
+    dailyCumulativeVolume: BigInt!
+    dailyComponentVolume: BigInt!
+    dailyTradingBotVolume: BigInt!
+    dailyComponentInstancesVolume: BigInt!
+
+    # Measured in TGEN.
+    totalCumulativeVolume: BigInt!
+    totalComponentVolume: BigInt!
+    totalTradingBotVolume: BigInt!
+    totalComponentInstancesVolume: BigInt!
+
+    dailyCumulativeSales: Int!
+    dailyComponentsSold: Int!
+    dailyTradingBotsSold: Int!
+    dailyComponentInstancesSold: Int!
+
+    txCount: Int!
+}
