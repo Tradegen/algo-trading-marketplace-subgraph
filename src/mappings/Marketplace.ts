@@ -273,7 +273,7 @@ export function handlePurchase(event: Purchased): void {
     let transaction = new Transaction(event.transaction.hash.toHexString());
     transaction.blockNumber = event.block.number;
     transaction.timestamp = event.block.timestamp;
-    transaction.user = user.id;
+    transaction.user = event.params.buyer.toHexString();
     transaction.contractType = listing.contractType;
     transaction.componentID = listing.componentID;
     transaction.tokenID = listing.tokenID;
