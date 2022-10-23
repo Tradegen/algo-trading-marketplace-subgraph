@@ -216,7 +216,7 @@ export function handleUpdatePrice(event: UpdatedPrice): void {
     updatePrice.transaction = transaction.id;
     updatePrice.timestamp = event.block.timestamp;
     updatePrice.seller = event.params.seller.toHexString();
-    updatePrice.newTokenPrice = event.params.newPrice;
+    updatePrice.newPrice = event.params.newPrice;
     updatePrice.index = event.params.marketplaceListingIndex;
     updatePrice.save();
 

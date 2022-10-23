@@ -5,31 +5,38 @@ type Marketplace @entity {
     # Total number of listings.
     listingCount: Int!
 
-    # Measured in TGEN.
+    # Measured in the protocol's governance token.
     totalVolume: BigInt!
     componentVolume: BigInt!
     tradingBotVolume: BigInt!
     componentInstanceVolume: BigInt!
 
+    # Aggregated sales across components, trading bots, and component instances.
     totalSales: Int!
     totalComponentsSold: Int!
     totalTradingBotsSold: Int!
     totalComponentInstancesSold: Int!
+
+    # Total number of transactions on the marketplace.
     txCount: Int!
 
     # Represents a percentage, denominated in 10000.
     # Ex) 2% fee = 200.
     transactionFee: BigInt!
 
-    # Measured in TGEN.
+    # Measured in the protocol's governance token.
     collectedFees: BigInt!
 }
 
 type Listing @entity {
     # Listing ID in Marketplace contract.
     id: ID!
+
+    # Whether the listing is marked as "exists".
+    # Listings in the Marketplace contract are never deleted.
     exists: Boolean!
 
+    # Reference to the listing's seller.
     seller: User!
 
     # 0 = trading bot.
@@ -43,7 +50,7 @@ type Listing @entity {
     # NFT ID.
     tokenID: BigInt!
 
-    # Measured in TGEN.
+    # Measured in the protocol's governance token.
     price: BigInt!
 }
 
@@ -51,32 +58,51 @@ type User @entity {
     # User's wallet address.
     id: ID!
     
+    # User's aggregated sales across components, trading bots, and component instances.
     totalNumberOfSales: Int!
     componentsSold: Int!
     tradingBotsSold: Int!
     componentInstancesSold: Int!
 
-    # Measured in TGEN.
+    # Measured in the protocol's governance token.
     totalVolume: BigInt!
     componentVolume: BigInt!
     tradingBotVolume: BigInt!
     componentInstancesVolume: BigInt!
     totalFeesPaid: BigInt
 
+    # Listing entities associated with this user.
+    # Includes inactive listings.
     listings: [Listing!]! @derivedFrom(field: "seller")
+
+    # Transaction entities associated with this user.
     transactions: [Transaction!]! @derivedFrom(field: "user")
 }
 
 type Transaction @entity {
     # Transaction hash.
     id: ID!
+
+    # Blockchain data pertaining to the transaction.
     blockNumber: BigInt!
     timestamp: BigInt!
+
+    # Reference to the User who submitted the transaction.
     user: User!
+
+    # 0 = trading bot.
+    # 1 = component.
+    # 2 = component instance.
     contractType: BigInt!
+
+    # Used for getting the ComponentInstances contract if needed.
     componentID: BigInt!
+
+    # NFT ID.
     tokenID: BigInt!
 
+    # Transaction type.
+    # Only one field will be populated.
     createListing: CreateListing
     removeListing: RemoveListing
     updatePrice: UpdatePrice
@@ -86,14 +112,28 @@ type Transaction @entity {
 type CreateListing @entity {
     # Transaction ID + "-createListing".
     id: ID!
+
+    # Reference to the parent Transaction entity.
     transaction: Transaction!
+
     # Need this to pull recent txns for marketplace.
     timestamp: BigInt! 
 
+    # Address of the seller.
     seller: String!
+
+    # 0 = trading bot.
+    # 1 = component.
+    # 2 = component instance.
     contractType: BigInt!
+
+    # Used for getting the ComponentInstances contract if needed.
     componentID: BigInt!
+
+    # NFT ID.
     tokenID: BigInt!
+
+    # Selling price of the NFT.
     price: BigInt!
 
     # Listing ID.
@@ -103,10 +143,14 @@ type CreateListing @entity {
 type RemoveListing @entity {
     # Transaction ID + "-removeListing".
     id: ID!
+
+    # Reference to the parent Transaction entity.
     transaction: Transaction!
+
     # Need this to pull recent txns for marketplace.
     timestamp: BigInt!
 
+    # Address of the seller.
     seller: String!
 
     # Listing ID.
@@ -116,12 +160,18 @@ type RemoveListing @entity {
 type UpdatePrice @entity {
     # Transaction ID + "-updatePrice".
     id: ID!
+
+    # Reference to the parent Transaction entity.
     transaction: Transaction!
+
     # Need this to pull recent txns for marketplace.
     timestamp: BigInt!
 
+    # Address of the seller.
     seller: String!
-    newTokenPrice: BigInt!
+
+    # New selling price of the NFT.
+    newPrice: BigInt!
 
     # Listing ID.
     index: BigInt!
@@ -130,14 +180,28 @@ type UpdatePrice @entity {
 type Purchase @entity {
     # Transaction ID + "-purchase".
     id: ID!
+
+    # Reference to the parent Transaction entity.
     transaction: Transaction!
+
     # Need this to pull recent txns for marketplace.
     timestamp: BigInt!
 
+    # Address of the buyer.
     buyer: String!
+
+    # 0 = trading bot.
+    # 1 = component.
+    # 2 = component instance.
     contractType: BigInt!
+
+    # Used for getting the ComponentInstances contract if needed.
     componentID: BigInt!
+
+    # NFT ID.
     tokenID: BigInt!
+
+    # Price at which the NFT was purchased.
     price: BigInt!
 
     # Listing ID.
@@ -150,24 +214,26 @@ type MarketplaceDayData @entity {
     id: ID! 
     date: Int!
 
-    # Measured in TGEN.
+    # Measured in the protocol's governance token.
     dailyCumulativeVolume: BigInt!
     dailyComponentVolume: BigInt!
     dailyTradingBotVolume: BigInt!
     dailyComponentInstancesVolume: BigInt!
     dailyFeesCollected: BigInt!
 
-    # Measured in TGEN.
+    # Measured in the protocol's governance token.
     totalCumulativeVolume: BigInt!
     totalComponentVolume: BigInt!
     totalTradingBotVolume: BigInt!
     totalComponentInstancesVolume: BigInt!
     totalFeesCollected: BigInt!
 
+    # Tracks number of sales on the marketplace for this day.
     dailyCumulativeSales: Int!
     dailyComponentsSold: Int!
     dailyTradingBotsSold: Int!
     dailyComponentInstancesSold: Int!
 
+    # Total number of transactions on the marketplace for this day.
     txCount: Int!
 }
